@@ -59,9 +59,9 @@ public class ElasticSearchConsumer {
 				String id = extractIdFromTweet(record.value());
 				//data will be added to elastic search
 				IndexRequest request = new IndexRequest(index,
-														index_type,
-														id) //id is used to make consumer idempotent
-											.source(record.value(),XContentType.JSON);
+									index_type,
+									id) //id is used to make consumer idempotent
+									.source(record.value(),XContentType.JSON);
 				bulkRequest.add(request);
 				
 //				IndexResponse response = client.index(request, RequestOptions.DEFAULT);
@@ -119,32 +119,29 @@ public class ElasticSearchConsumer {
 
 	public static RestHighLevelClient createClient() {
 
-		String hostname="kafka-twitter-2175320114.ap-southeast-2.bonsaisearch.net";
-		String username="quumryc62x";
-		String password="jkp40oykex";
+		String hostname="";
+		String username="";
+		String password="";
 		
 		//don't do if using local Elastic Search
 		final CredentialsProvider credentialsProvider= new BasicCredentialsProvider();
 		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 		
 		RestClientBuilder builder=  RestClient.builder(new HttpHost(hostname,443,"https"))
-									.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-										
-										public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+						      .setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+					public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
 											
-											return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-										}
-									});
+					       return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+								}
+								});
 		
 		RestHighLevelClient client = new RestHighLevelClient(builder);
 		
 		return client;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private static JsonParser jsonParser = new JsonParser();
 	
-	@SuppressWarnings("deprecation")
 	private static String extractIdFromTweet(String tweetJson) {
 		return jsonParser.parse(tweetJson)
 				  .getAsJsonObject()
